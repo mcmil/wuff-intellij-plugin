@@ -1,7 +1,6 @@
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,12 +9,14 @@ import javax.swing.*;
 /**
  * Created by Michal on 2014-09-06.
  */
-public class WuffConfigurationType implements ConfigurationType{
+public class WuffConfigurationType implements ConfigurationType {
 
-    private final ConfigurationFactory myFactory;
+    public static final String WUFF_ID = "wuff";
+
+    private final ConfigurationFactory configurationFactory;
 
     public WuffConfigurationType() {
-        myFactory = new ConfigurationFactory(this) {
+        configurationFactory = new ConfigurationFactory(this) {
             public RunConfiguration createTemplateConfiguration(Project project) {
                 final WuffRunConfiguration runConfiguration = new WuffRunConfiguration(project, this, "");
 
@@ -33,7 +34,7 @@ public class WuffConfigurationType implements ConfigurationType{
             }
 
             public RunConfiguration createConfiguration(String name, RunConfiguration template) {
-                final WuffRunConfiguration pluginRunConfiguration = (WuffRunConfiguration)template;
+                final WuffRunConfiguration pluginRunConfiguration = (WuffRunConfiguration) template;
                 return super.createConfiguration(name, pluginRunConfiguration);
             }
         };
@@ -41,27 +42,27 @@ public class WuffConfigurationType implements ConfigurationType{
 
     @Override
     public String getDisplayName() {
-        return "Wuff configuration type";
+        return WuffBundle.message("wuff.run.configuration.name");
     }
 
     @Override
     public String getConfigurationTypeDescription() {
-        return "Well hello there Wuff";
+        return WuffBundle.message("wuff.run.configuration.description");
     }
 
     @Override
     public Icon getIcon() {
-        return null;
+        return WuffIcons.WUFF_SMALL;
     }
 
     @NotNull
     @Override
     public String getId() {
-        return "wuff-config type";
+        return WUFF_ID;
     }
 
     @Override
     public ConfigurationFactory[] getConfigurationFactories() {
-        return new ConfigurationFactory[] { myFactory};
+        return new ConfigurationFactory[]{configurationFactory};
     }
 }
