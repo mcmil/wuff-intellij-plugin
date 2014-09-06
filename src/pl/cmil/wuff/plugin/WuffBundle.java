@@ -1,3 +1,5 @@
+package pl.cmil.wuff.plugin;
+
 import com.intellij.AbstractBundle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;

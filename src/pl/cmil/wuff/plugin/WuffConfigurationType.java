@@ -1,3 +1,5 @@
+package pl.cmil.wuff.plugin;
+
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;

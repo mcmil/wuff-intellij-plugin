@@ -1,3 +1,5 @@
+package pl.cmil.wuff.plugin;
+
 import com.intellij.openapi.util.IconLoader;
 
 import javax.swing.*;

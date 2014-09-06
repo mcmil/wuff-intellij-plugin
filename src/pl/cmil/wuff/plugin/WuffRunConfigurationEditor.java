@@ -1,10 +1,9 @@
+package pl.cmil.wuff.plugin;
+
 import com.intellij.openapi.module.JavaModuleType;
-import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
-import com.intellij.ui.PanelWithAnchor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.roots.ui.configuration.ModulesCombobox;
 
 import javax.swing.*;
