@@ -15,13 +15,24 @@ import org.apache.tools.ant.types.FileSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.List;
 
-public class EquinoxJavaCommandLineState extends JavaCommandLineState  {
+public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     private final Module appModule;
+    private final String mainClass;
+    private final String vmArgs;
+    private final List<EquinoxConfigurationValues> enabledConfigs;
+    private final String applicationName;
 
-    protected EquinoxJavaCommandLineState(Module appModule, @NotNull ExecutionEnvironment environment) {
+
+    protected EquinoxJavaCommandLineState(Module appModule, String mainClass, String vmArgs,
+                                          List<EquinoxConfigurationValues> enabledConfigs, String applicationName, @NotNull ExecutionEnvironment environment) {
         super(environment);
         this.appModule = appModule;
+        this.mainClass = mainClass;
+        this.vmArgs = vmArgs;
+        this.enabledConfigs = enabledConfigs;
+        this.applicationName = applicationName;
     }
 
     @Override
@@ -41,18 +52,18 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState  {
     private void setupLaunchConfiguration(JavaParameters params, ExecutionEnvironment executionEnvironment) {
         params.setJdk(ProjectRootManager.getInstance(executionEnvironment.getProject()).getProjectSdk());
         params.setWorkingDirectory(getModuleBuildPath(appModule) + File.separator + "run");
+        params.getVMParametersList().addParametersString(vmArgs);
 
-        params.setMainClass("org.eclipse.equinox.launcher.Main");
+        params.setMainClass(mainClass);
     }
 
     private void fillProgramParameters(JavaParameters params) {
         ParametersList programParametersList = params.getProgramParametersList();
-        programParametersList.add("-console");
-        programParametersList.add("-consoleLog");
-        programParametersList.add("-noExit");
-        programParametersList.add("-clean");
-        programParametersList.add("-clearPersistedState");
-        programParametersList.add("-application", "org.eclipse.fx.ui.workbench.fx.application");
+        for (EquinoxConfigurationValues configurationValue : enabledConfigs) {
+            programParametersList.add(configurationValue.getParameter());
+        }
+
+        programParametersList.add("-application", applicationName);
         programParametersList.add("-configuration", "configuration");
         programParametersList.add("%*");
     }

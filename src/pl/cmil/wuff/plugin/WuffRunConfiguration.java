@@ -18,10 +18,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WuffRunConfiguration extends RunConfigurationBase implements ModuleRunConfiguration {
 
     private Module appModule;
+    private List<EquinoxConfigurationValues> enabledConfigs = new ArrayList<EquinoxConfigurationValues>();
+    private String mainClass ="";
+    private String vmArgs = "";
+    private String applicationName = "";
+
+
 
     public WuffRunConfiguration(final Project project, final ConfigurationFactory factory, final String name) {
         super(project, factory, name);
@@ -38,6 +46,12 @@ public class WuffRunConfiguration extends RunConfigurationBase implements Module
         if(getModule() == null) {
             throw new RuntimeConfigurationException(WuffBundle.message("wuff.run.configuration.equinoxapp.module.not.specified"));
         }
+        if(getMainClass() == null || getMainClass().isEmpty()) {
+            throw new RuntimeConfigurationException(WuffBundle.message("wuff.run.configuration.equinoxapp.main.class.empty"));
+        }
+        if(getApplicationName() == null || getApplicationName().isEmpty()) {
+            throw new RuntimeConfigurationException(WuffBundle.message("wuff.run.configuration.application.name.empty"));
+        }
     }
 
     @Nullable
@@ -49,7 +63,7 @@ public class WuffRunConfiguration extends RunConfigurationBase implements Module
         if(ProjectRootManager.getInstance(executionEnvironment.getProject()).getProjectSdk() == null) {
             throw CantRunException.noJdkConfigured();
         }
-        return new EquinoxJavaCommandLineState(getModule(),executionEnvironment);
+        return new EquinoxJavaCommandLineState(getModule(),getMainClass(), getVmArgs(), getEnabledConfigs(),getApplicationName(),executionEnvironment);
     }
 
     @Nullable
@@ -69,5 +83,33 @@ public class WuffRunConfiguration extends RunConfigurationBase implements Module
     public Module[] getModules() {
         final Module module = getModule();
         return module != null ? new Module[]{module} : Module.EMPTY_ARRAY;
+    }
+
+    public List<EquinoxConfigurationValues> getEnabledConfigs() {
+        return enabledConfigs;
+    }
+
+    public String getMainClass() {
+        return mainClass;
+    }
+
+    public void setMainClass(String mainClass) {
+        this.mainClass = mainClass;
+    }
+
+    public String getVmArgs() {
+        return vmArgs;
+    }
+
+    public void setVmArgs(String vmArgs) {
+        this.vmArgs = vmArgs;
+    }
+
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
     }
 }

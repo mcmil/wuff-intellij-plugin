@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.Arrays;
 
 /**
  * Created by Michal on 2014-09-06.
@@ -20,8 +21,12 @@ public class WuffConfigurationType implements ConfigurationType {
     public WuffConfigurationType() {
         configurationFactory = new ConfigurationFactory(this) {
             public RunConfiguration createTemplateConfiguration(Project project) {
-                final WuffRunConfiguration runConfiguration = new WuffRunConfiguration(project, this, "");
-
+                final WuffRunConfiguration runConfiguration = new WuffRunConfiguration(project, this, "e(fx)clipse");
+                runConfiguration.setMainClass("org.eclipse.equinox.launcher.Main");
+                runConfiguration.getEnabledConfigs().addAll(Arrays.asList(EquinoxConfigurationValues.CLEAN,
+                        EquinoxConfigurationValues.CLEAR_PERSISTED_STATE, EquinoxConfigurationValues.CONSOLE, EquinoxConfigurationValues.CONSOLE_LOG));
+                runConfiguration.setApplicationName("org.eclipse.fx.ui.workbench.fx.application");
+                runConfiguration.setVmArgs("");
                 return runConfiguration;
             }
 
