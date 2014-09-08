@@ -5,8 +5,10 @@ import com.intellij.execution.configurations.JavaCommandLineState;
 import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.util.ExternalSystemConstants;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -15,7 +17,9 @@ import org.apache.tools.ant.types.FileSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     private final Module appModule;
@@ -24,6 +28,7 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     private final List<EquinoxConfigurationValues> enabledConfigs;
     private final String applicationName;
 
+    private final static Logger log = Logger.getInstance(EquinoxJavaCommandLineState.class);
 
     protected EquinoxJavaCommandLineState(Module appModule, String mainClass, String vmArgs,
                                           List<EquinoxConfigurationValues> enabledConfigs, String applicationName, @NotNull ExecutionEnvironment environment) {
@@ -75,9 +80,13 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     }
 
     private void rebuildJars() throws ExecutionException {
-        rebuildModuleJar(appModule);
-        for (Module depedenencyModule : ModuleRootManager.getInstance(appModule).getDependencies()) {
-            rebuildModuleJar(depedenencyModule);
+        Set<Module> modulesToRebuild =new HashSet<>();
+        ModuleUtilCore.getDependencies(appModule, modulesToRebuild);
+
+        log.info("Rebuilding modules: " + modulesToRebuild);
+
+        for (Module module : modulesToRebuild) {
+            rebuildModuleJar(module);
         }
     }
 
@@ -90,14 +99,13 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
             moduleJar.setProject(new org.apache.tools.ant.Project());
             moduleJar.setManifest(manifestFile);
 
-            FileSet classSet = new FileSet();
-            classSet.setDir(new File(moduleBuildPath + File.separator + "classes" + File.separator + "main" + File.separator));
+            File classDir = new File(moduleBuildPath + File.separator + "classes" + File.separator + "main" + File.separator);
+            addDirectoryToJar(moduleJar, classDir);
 
-            FileSet resSet = new FileSet();
-            resSet.setDir(new File(moduleBuildPath + File.separator + "resources" + File.separator + "main" + File.separator));
-
-            moduleJar.addFileset(classSet);
-            moduleJar.addFileset(resSet);
+            File resourceDirectory = new File(moduleBuildPath + File.separator + "resources" + File.separator + "main" + File.separator);
+            if(resourceDirectory.exists()) {
+                addDirectoryToJar(moduleJar, resourceDirectory);
+            }
 
             File output = new File(moduleBuildPath + File.separator + "libs" + File.separator + getJarName(module));
             moduleJar.setDestFile(output);
@@ -107,6 +115,12 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
             throw new ExecutionException(WuffBundle.message("wuff.runtime.notprebuilt", appModule.getOptionValue(ExternalSystemConstants.EXTERNAL_SYSTEM_MODULE_GROUP_KEY)));
         }
 
+    }
+
+    private void addDirectoryToJar(Jar moduleJar, File dir) {
+        FileSet classSet = new FileSet();
+        classSet.setDir(dir);
+        moduleJar.addFileset(classSet);
     }
 
     private boolean isProjectPrebuiltByGradle(File manifestFile) {
