@@ -1,28 +1,22 @@
 <idea-plugin version="2">
-  <id>com.yourcompany.unique.plugin.id</id>
-  <name>Plugin display name here</name>
-  <version>1.0</version>
-  <vendor email="cmilmichal@gmail.com" url="http://www.yourcompany.com">Michal Ćmil</vendor>
+  <id>pl.cmil.wuff.plugin</id>
+  <name>Wuff IntelliJ Plugin</name>
+  <version>0.1.0</version>
+  <vendor email="cmilmichal@gmail.com" url="https://github.com/mcmil/wuff-intellij-plugin">Michal Ćmil</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+  A plugin which attempts to ease Eclipse E4 development using Wuff in IntelliJ IDEA.
     ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+      Initial release
     ]]>
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="131"/>
+  <idea-version since-build="135"/>
 
-  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
-  -->
+
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
