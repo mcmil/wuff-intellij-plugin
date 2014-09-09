@@ -1,35 +1,29 @@
 package pl.cmil.wuff.plugin;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.intellij.execution.CantRunException;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.openapi.externalSystem.util.ExternalSystemConstants;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vfs.VirtualFile;
-import org.apache.tools.ant.taskdefs.Jar;
-import org.apache.tools.ant.types.FileSet;
+import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.WriteExternalException;
+import org.jdom.Attribute;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 public class WuffRunConfiguration extends RunConfigurationBase implements ModuleRunConfiguration {
+    private static final String CONFIG_STORAGE = "wuff-runner-config";
 
-    private Module appModule;
-    private List<EquinoxConfigurationValues> enabledConfigs = new ArrayList<EquinoxConfigurationValues>();
-    private String mainClass ="";
-    private String vmArgs = "";
-    private String applicationName = "";
-
-
+    private PersistentConfigurationValues configurationValues = new PersistentConfigurationValues();
+    private Module module;
 
     public WuffRunConfiguration(final Project project, final ConfigurationFactory factory, final String name) {
         super(project, factory, name);
@@ -43,13 +37,13 @@ public class WuffRunConfiguration extends RunConfigurationBase implements Module
 
     @Override
     public void checkConfiguration() throws RuntimeConfigurationException {
-        if(getModule() == null) {
+        if (getModule() == null) {
             throw new RuntimeConfigurationException(WuffBundle.message("wuff.run.configuration.equinoxapp.module.not.specified"));
         }
-        if(getMainClass() == null || getMainClass().isEmpty()) {
+        if (configurationValues.getMainClass() == null || configurationValues.getMainClass().isEmpty()) {
             throw new RuntimeConfigurationException(WuffBundle.message("wuff.run.configuration.equinoxapp.main.class.empty"));
         }
-        if(getApplicationName() == null || getApplicationName().isEmpty()) {
+        if (configurationValues.getApplicationName() == null || configurationValues.getApplicationName().isEmpty()) {
             throw new RuntimeConfigurationException(WuffBundle.message("wuff.run.configuration.application.name.empty"));
         }
     }
@@ -57,26 +51,33 @@ public class WuffRunConfiguration extends RunConfigurationBase implements Module
     @Nullable
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull final ExecutionEnvironment executionEnvironment) throws ExecutionException {
-        if(getModule() == null) {
+        if (getModule() == null) {
             throw new CantRunException(WuffBundle.message("wuff.run.configuration.equinoxapp.module.not.specified"));
         }
-        if(ProjectRootManager.getInstance(executionEnvironment.getProject()).getProjectSdk() == null) {
+        if (ProjectRootManager.getInstance(executionEnvironment.getProject()).getProjectSdk() == null) {
             throw CantRunException.noJdkConfigured();
         }
-        return new EquinoxJavaCommandLineState(getModule(),getMainClass(), getVmArgs(), getEnabledConfigs(),getApplicationName(),executionEnvironment);
+        return new EquinoxJavaCommandLineState(getModule(), configurationValues.getMainClass(), configurationValues.getVmArgs(), configurationValues.getEnabledConfigs(), configurationValues.getApplicationName(), executionEnvironment);
+    }
+
+    public PersistentConfigurationValues getConfigurationValues() {
+        return configurationValues;
     }
 
     @Nullable
     public Module getModule() {
-        if (appModule != null && appModule.isDisposed()) {
-            appModule = null;
+        if (module != null && module.getName() == configurationValues.getModuleName()) {
+            return module;
         }
-        return appModule;
+
+        if (configurationValues.getModuleName() != null) {
+            module = ModuleManager.getInstance(getProject()).findModuleByName(configurationValues.getModuleName());
+        } else {
+            module = null;
+        }
+        return module;
     }
 
-    public void setModule(Module module) {
-        appModule = module;
-    }
 
     @Override
     @NotNull
@@ -85,31 +86,26 @@ public class WuffRunConfiguration extends RunConfigurationBase implements Module
         return module != null ? new Module[]{module} : Module.EMPTY_ARRAY;
     }
 
-    public List<EquinoxConfigurationValues> getEnabledConfigs() {
-        return enabledConfigs;
+    @Override
+    public void writeExternal(Element element) throws WriteExternalException {
+        Gson gson = new GsonBuilder().create();
+        Element configElement = new Element(CONFIG_STORAGE);
+        configElement.setText(gson.toJson(configurationValues));
+
+        element.addContent(configElement);
+        super.writeExternal(element);
     }
 
-    public String getMainClass() {
-        return mainClass;
+    @Override
+    public void readExternal(Element element) throws InvalidDataException {
+        Element config = element.getChild(CONFIG_STORAGE);
+        if (config != null) {
+                Gson gson = new GsonBuilder().create();
+                PersistentConfigurationValues stored = gson.fromJson(config.getText(), PersistentConfigurationValues.class);
+                configurationValues.copyFrom(stored);
+            }
+           super.readExternal(element);
     }
 
-    public void setMainClass(String mainClass) {
-        this.mainClass = mainClass;
-    }
 
-    public String getVmArgs() {
-        return vmArgs;
-    }
-
-    public void setVmArgs(String vmArgs) {
-        this.vmArgs = vmArgs;
-    }
-
-    public String getApplicationName() {
-        return applicationName;
-    }
-
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
-    }
 }

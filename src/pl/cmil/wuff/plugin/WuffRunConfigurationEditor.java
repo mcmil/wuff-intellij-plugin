@@ -1,6 +1,7 @@
 package pl.cmil.wuff.plugin;
 
 import com.intellij.openapi.module.JavaModuleType;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.ui.LabeledComponent;
@@ -32,58 +33,57 @@ public class WuffRunConfigurationEditor extends SettingsEditor<WuffRunConfigurat
 
 
     private WuffRunConfiguration config;
+    private PersistentConfigurationValues configurationValues;
+
     private final List<JBCheckBox> launchConfigOptions;
-    private Map<JBCheckBox, EquinoxConfigurationValues> optionMapping = new HashMap<JBCheckBox, EquinoxConfigurationValues>();
+    private Map<JBCheckBox, EquinoxConfigurationOptions> optionMapping = new HashMap<JBCheckBox, EquinoxConfigurationOptions>();
 
     public WuffRunConfigurationEditor(WuffRunConfiguration config) {
         this.config = config;
+        configurationValues = config.getConfigurationValues();
+
         launchConfigOptions = Arrays.asList(myConsole, myConsoleLog, myClearPersistedState, myNoExit, myOSGiClean);
-        optionMapping.put(myConsole, EquinoxConfigurationValues.CONSOLE);
-        optionMapping.put(myConsoleLog, EquinoxConfigurationValues.CONSOLE_LOG);
-        optionMapping.put(myOSGiClean, EquinoxConfigurationValues.CLEAN);
-        optionMapping.put(myClearPersistedState, EquinoxConfigurationValues.CLEAR_PERSISTED_STATE);
-        optionMapping.put(myNoExit, EquinoxConfigurationValues.NO_EXIT);
+        optionMapping.put(myConsole, EquinoxConfigurationOptions.CONSOLE);
+        optionMapping.put(myConsoleLog, EquinoxConfigurationOptions.CONSOLE_LOG);
+        optionMapping.put(myOSGiClean, EquinoxConfigurationOptions.CLEAN);
+        optionMapping.put(myClearPersistedState, EquinoxConfigurationOptions.CLEAR_PERSISTED_STATE);
+        optionMapping.put(myNoExit, EquinoxConfigurationOptions.NO_EXIT);
     }
 
     @Override
-    protected void resetEditorFrom(WuffRunConfiguration wuffRunConfiguration) {
-        config.setModule(wuffRunConfiguration.getModule());
-        config.setMainClass(wuffRunConfiguration.getMainClass());
-        config.setVmArgs(wuffRunConfiguration.getVmArgs());
-        config.setApplicationName(wuffRunConfiguration.getApplicationName());
-        config.getEnabledConfigs().clear();
-        config.getEnabledConfigs().addAll(wuffRunConfiguration.getEnabledConfigs());
+    protected void resetEditorFrom(WuffRunConfiguration other) {
+        config.getConfigurationValues().copyFrom(other.getConfigurationValues());
+        setCurrentValuesToControls();
     }
 
     @Override
     protected void applyEditorTo(WuffRunConfiguration wuffRunConfiguration) throws ConfigurationException {
-        wuffRunConfiguration.setModule(myModules.getSelectedModule());
-        wuffRunConfiguration.setMainClass(myEquinoxMainClass.getText());
-        wuffRunConfiguration.setVmArgs(myVMParameters.getComponent().getText());
-        wuffRunConfiguration.setApplicationName(myApplicationName.getText());
-        java.util.List<EquinoxConfigurationValues> enabledConfigs = wuffRunConfiguration.getEnabledConfigs();
-        enabledConfigs.clear();
+        PersistentConfigurationValues configurationValues = wuffRunConfiguration.getConfigurationValues();
 
-        for(JBCheckBox cb : launchConfigOptions) {
-            if(cb.isSelected()) {
-                enabledConfigs.add(optionMapping.get(cb));
+        Module selectedModule = myModules.getSelectedModule();
+        String selectedModuleName = selectedModule == null ? null : selectedModule.getName();
+
+        configurationValues.setModuleName(selectedModuleName);
+        configurationValues.setMainClass(myEquinoxMainClass.getText());
+        configurationValues.setVmArgs(myVMParameters.getComponent().getText());
+        configurationValues.setApplicationName(myApplicationName.getText());
+        java.util.List<EquinoxConfigurationOptions> enabledConfigsFromEditor = new ArrayList<>();
+
+        for (JBCheckBox cb : launchConfigOptions) {
+            if (cb.isSelected()) {
+                enabledConfigsFromEditor.add(optionMapping.get(cb));
             }
         }
-
-
+        configurationValues.replaceAllEnableConfigs(enabledConfigsFromEditor);
     }
 
     @NotNull
     @Override
     protected JComponent createEditor() {
-
         JPanel panel = new JPanel(new GridBagLayout());
-
-        myModules.fillModules(config.getProject(), JavaModuleType.getModuleType());
 
         myVMParameters.setComponent(new RawCommandLineEditor());
         myVMParameters.setText(WuffBundle.message("wuff.run.config.jvmparams"));
-        myVMParameters.getComponent().setText(config.getVmArgs());
 
         GridBagConstraints gc = new GridBagConstraints(0, GridBagConstraints.RELATIVE, 2, 1, 1, 0, GridBagConstraints.WEST,
                 GridBagConstraints.HORIZONTAL, new Insets(2, 0, 0, 0), UIUtil.DEFAULT_HGAP, UIUtil.DEFAULT_VGAP);
@@ -92,7 +92,6 @@ public class WuffRunConfigurationEditor extends SettingsEditor<WuffRunConfigurat
         gc.gridx = 1;
         gc.weightx = 7;
         panel.add(myModules, gc);
-        myModules.setSelectedModule(config.getModule());
 
         gc.gridx = 0;
         gc.weightx = 1;
@@ -101,7 +100,6 @@ public class WuffRunConfigurationEditor extends SettingsEditor<WuffRunConfigurat
         gc.gridx = 1;
         gc.weightx = 1;
         panel.add(myEquinoxMainClass, gc);
-        myEquinoxMainClass.setText(config.getMainClass());
 
         gc.gridx = 0;
         gc.weightx = 1;
@@ -110,24 +108,35 @@ public class WuffRunConfigurationEditor extends SettingsEditor<WuffRunConfigurat
         gc.gridx = 1;
         gc.weightx = 1;
         panel.add(myApplicationName, gc);
-        myApplicationName.setText(config.getApplicationName());
 
         gc.weightx = 10;
         gc.gridx = 0;
         panel.add(myVMParameters, gc);
 
         panel.add(createCheckboxPanel(), gc);
+        setCurrentValuesToControls();
 
         return panel;
+    }
+
+    private void setCurrentValuesToControls() {
+        myModules.fillModules(config.getProject(), JavaModuleType.getModuleType());
+        myVMParameters.getComponent().setText(configurationValues.getVmArgs());
+        myModules.setSelectedModule(config.getModule());
+        myEquinoxMainClass.setText(configurationValues.getMainClass());
+        myApplicationName.setText(configurationValues.getApplicationName());
+        for (JBCheckBox jb : launchConfigOptions) {
+            if (configurationValues.getEnabledConfigs().contains(optionMapping.get(jb))) {
+                jb.setSelected(true);
+            }
+        }
+
     }
 
     private Component createCheckboxPanel() {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(WuffBundle.message("wuff.run.config.launchparams")));
-        for(JBCheckBox jb : launchConfigOptions) {
-            if(config.getEnabledConfigs().contains(optionMapping.get(jb))) {
-                jb.setSelected(true);
-            }
+        for (JBCheckBox jb : launchConfigOptions) {
             panel.add(jb);
         }
 

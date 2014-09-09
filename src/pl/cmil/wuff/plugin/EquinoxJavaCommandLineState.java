@@ -25,13 +25,13 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     private final Module appModule;
     private final String mainClass;
     private final String vmArgs;
-    private final List<EquinoxConfigurationValues> enabledConfigs;
+    private final List<EquinoxConfigurationOptions> enabledConfigs;
     private final String applicationName;
 
     private final static Logger log = Logger.getInstance(EquinoxJavaCommandLineState.class);
 
     protected EquinoxJavaCommandLineState(Module appModule, String mainClass, String vmArgs,
-                                          List<EquinoxConfigurationValues> enabledConfigs, String applicationName, @NotNull ExecutionEnvironment environment) {
+                                          List<EquinoxConfigurationOptions> enabledConfigs, String applicationName, @NotNull ExecutionEnvironment environment) {
         super(environment);
         this.appModule = appModule;
         this.mainClass = mainClass;
@@ -64,7 +64,7 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
 
     private void fillProgramParameters(JavaParameters params) {
         ParametersList programParametersList = params.getProgramParametersList();
-        for (EquinoxConfigurationValues configurationValue : enabledConfigs) {
+        for (EquinoxConfigurationOptions configurationValue : enabledConfigs) {
             programParametersList.add(configurationValue.getParameter());
         }
 

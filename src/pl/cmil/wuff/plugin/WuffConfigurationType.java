@@ -21,12 +21,14 @@ public class WuffConfigurationType implements ConfigurationType {
     public WuffConfigurationType() {
         configurationFactory = new ConfigurationFactory(this) {
             public RunConfiguration createTemplateConfiguration(Project project) {
-                final WuffRunConfiguration runConfiguration = new WuffRunConfiguration(project, this, "e(fx)clipse");
-                runConfiguration.setMainClass("org.eclipse.equinox.launcher.Main");
-                runConfiguration.getEnabledConfigs().addAll(Arrays.asList(EquinoxConfigurationValues.CLEAN,
-                        EquinoxConfigurationValues.CLEAR_PERSISTED_STATE, EquinoxConfigurationValues.CONSOLE, EquinoxConfigurationValues.CONSOLE_LOG));
-                runConfiguration.setApplicationName("org.eclipse.fx.ui.workbench.fx.application");
-                runConfiguration.setVmArgs("");
+                final WuffRunConfiguration runConfiguration = new WuffRunConfiguration(project, this, "");
+                PersistentConfigurationValues configurationValues = runConfiguration.getConfigurationValues();
+
+                configurationValues.setMainClass("org.eclipse.equinox.launcher.Main");
+                configurationValues.replaceAllEnableConfigs(Arrays.asList(EquinoxConfigurationOptions.CLEAN,
+                        EquinoxConfigurationOptions.CLEAR_PERSISTED_STATE, EquinoxConfigurationOptions.CONSOLE, EquinoxConfigurationOptions.CONSOLE_LOG));
+                configurationValues.setApplicationName("org.eclipse.fx.ui.workbench.fx.application");
+                configurationValues.setVmArgs("");
                 return runConfiguration;
             }
 
@@ -41,8 +43,12 @@ public class WuffConfigurationType implements ConfigurationType {
             }
 
             public RunConfiguration createConfiguration(String name, RunConfiguration template) {
-                final WuffRunConfiguration pluginRunConfiguration = (WuffRunConfiguration) template;
-                return super.createConfiguration(name, pluginRunConfiguration);
+                final WuffRunConfiguration templateConfig = (WuffRunConfiguration) template;
+
+                WuffRunConfiguration configuration = new WuffRunConfiguration(templateConfig.getProject(), this, template.getName());
+                configuration.getConfigurationValues().copyFrom(templateConfig.getConfigurationValues());
+
+                return super.createConfiguration(name, configuration);
             }
         };
     }
