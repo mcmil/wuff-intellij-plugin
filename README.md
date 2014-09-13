@@ -10,3 +10,8 @@ A plugin which attempts to ease Eclipse E4 development using [Wuff](https://gith
 * Currently supports only [e(fx)clipse](http://www.eclipse.org/efxclipse/index.html) 
 * In case a change in manifests or dependencies, a gradle build is required (at least the task `prepareRunConfig` must be executed) 
 * IntelliJ Idea in version 13.1.4 is required at the moment (Gradle projects are imported in a different way in version 13.1.3)
+
+#Releases
+Newest release available at [JetBrains Plugin Repository](http://plugins.jetbrains.com/plugin/7557?pr=).
+
+* 0.1.0: Wuff Run Configuration for running a project built with Wuff 
