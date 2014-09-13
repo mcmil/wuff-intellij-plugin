@@ -13,6 +13,8 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.tools.ant.taskdefs.Jar;
+import org.apache.tools.ant.taskdefs.Zip;
+import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.apache.tools.ant.types.FileSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -96,6 +98,7 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
 
         if (isProjectPrebuiltByGradle(manifestFile)) {
             Jar moduleJar = new Jar();
+            moduleJar.setDuplicate((Zip.Duplicate) Zip.Duplicate.getInstance(Zip.Duplicate.class, "preserve"));
             moduleJar.setProject(new org.apache.tools.ant.Project());
             moduleJar.setManifest(manifestFile);
 
@@ -118,9 +121,9 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     }
 
     private void addDirectoryToJar(Jar moduleJar, File dir) {
-        FileSet classSet = new FileSet();
-        classSet.setDir(dir);
-        moduleJar.addFileset(classSet);
+        FileSet fileSet = new FileSet();
+        fileSet.setDir(dir);
+        moduleJar.addFileset(fileSet);
     }
 
     private boolean isProjectPrebuiltByGradle(File manifestFile) {

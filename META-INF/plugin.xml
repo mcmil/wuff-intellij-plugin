@@ -1,39 +1,38 @@
 <idea-plugin version="2">
-  <id>pl.cmil.wuff.plugin</id>
-  <name>Wuff IntelliJ Plugin</name>
-  <version>0.1.0</version>
-  <vendor email="cmilmichal@gmail.com" url="https://github.com/mcmil/wuff-intellij-plugin">Michal Ćmil</vendor>
+    <id>pl.cmil.wuff.plugin</id>
+    <name>Wuff IntelliJ Plugin</name>
+    <version>0.1.0</version>
+    <vendor email="cmilmichal@gmail.com" url="https://github.com/mcmil/wuff-intellij-plugin">Michal Ćmil</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
   A plugin which attempts to ease Eclipse E4 development using Wuff in IntelliJ IDEA.
     ]]></description>
 
-  <change-notes><![CDATA[
-      Initial release
+    <change-notes><![CDATA[
+      Initial release. Provides Wuff Run Configuration which allows to make changes in the application without a full gradle build.
     ]]>
-  </change-notes>
+    </change-notes>
 
-  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="135"/>
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="135"/>
 
 
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <configurationType implementation="pl.cmil.wuff.plugin.WuffConfigurationType"/>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
-      <configurationType implementation="pl.cmil.wuff.plugin.WuffConfigurationType"/>
+    </extensions>
 
-  </extensions>
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
 
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
 
-  <project-components>
-    <!-- Add your project components here -->
-  </project-components>
-
-  <actions>
-    <!-- Add your actions here -->
-  </actions>
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
 
 </idea-plugin>
