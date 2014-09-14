@@ -5,9 +5,12 @@ Wuff IntelliJ Plugin
 
 A plugin which attempts to ease Eclipse E4 development using [Wuff](https://github.com/akhikhl/wuff) in IntelliJ IDEA. To try it out, you can use the [Wuff e(fx)clipse project](https://github.com/mcmil/wuff-efxclipse-samples)
 
+###Latest news
+
+* [0.2.0.alpha](https://github.com/mcmil/wuff-intellij-plugin/releases/tag/v0.2.0.alpha) pre-release: Wuff 0.0.13-SNAPSHOT changes introduced (broken compatibility with 0.0.12)
+
 ###Releases
 Newest release available at [JetBrains Plugin Repository](http://plugins.jetbrains.com/plugin/7557?pr=).
-* [0.2.0.alpha](https://github.com/mcmil/wuff-intellij-plugin/releases/tag/v0.2.0.alpha): Wuff 0.0.13-SNAPSHOT changes introduced (broken compatibility with 0.0.12)
 * [0.1.0](https://github.com/mcmil/wuff-intellij-plugin/releases/tag/v0.1.0): Wuff Run Configuration for running a project built with Wuff 
 
 ###Features 
