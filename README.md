@@ -1,7 +1,7 @@
 Wuff IntelliJ Plugin
 ====================
 [![Release](http://img.shields.io/badge/release-0.1.0-47b31f.svg)](https://github.com/mcmil/wuff-intellij-plugin/releases/latest)
-[![Current](http://img.shields.io/badge/release-0.2.0--SNAPSHOT-47b31f.svg)](https://github.com/mcmil/wuff-intellij-plugin)
+[![Current](http://img.shields.io/badge/current-0.2.0--SNAPSHOT-47b31f.svg)](https://github.com/mcmil/wuff-intellij-plugin)
 
 A plugin which attempts to ease Eclipse E4 development using [Wuff](https://github.com/akhikhl/wuff) in IntelliJ IDEA. 
 
