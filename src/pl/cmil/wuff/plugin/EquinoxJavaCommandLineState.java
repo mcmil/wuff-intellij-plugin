@@ -131,7 +131,7 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     }
 
     private String getJarName(Module myModule) {
-        return myModule.getName() + "-" + myModule.getOptionValue(ExternalSystemConstants.EXTERNAL_SYSTEM_MODULE_VERSION_KEY) + ".jar";
+        return myModule.getName() + "_" + myModule.getOptionValue(ExternalSystemConstants.EXTERNAL_SYSTEM_MODULE_VERSION_KEY) + ".jar";
     }
 
     private String getModuleBuildPath(Module module) {
