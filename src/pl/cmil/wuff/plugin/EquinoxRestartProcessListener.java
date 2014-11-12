@@ -5,6 +5,7 @@ import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 
 /**
@@ -29,8 +30,14 @@ class EquinoxRestartProcessListener extends ProcessAdapter {
         int exitCode = event.getExitCode();
 
         if (exitCode == EQUINOX_RESTART_EXIT_CODE) {
-            ProgramRunnerUtil.executeConfiguration(appModule.getProject(),
-                    environment.getRunnerAndConfigurationSettings(), executor);
+            ApplicationManager.getApplication().runReadAction(new Runnable() {
+                @Override
+                public void run() {
+                    ProgramRunnerUtil.executeConfiguration(appModule.getProject(),
+                            environment.getRunnerAndConfigurationSettings(), executor);
+                }
+            });
+
         }
     }
 }
