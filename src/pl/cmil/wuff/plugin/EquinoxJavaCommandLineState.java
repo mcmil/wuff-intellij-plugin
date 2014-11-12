@@ -50,9 +50,22 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     @NotNull
     @Override
     protected OSProcessHandler startProcess() throws ExecutionException {
+        validateIfProjectIsPrebuilt();
+
         final OSProcessHandler osProcessHandler = super.startProcess();
         osProcessHandler.addProcessListener(new EquinoxRestartProcessListener(appModule, environment, executor));
         return osProcessHandler;
+    }
+
+    private void validateIfProjectIsPrebuilt() throws ExecutionException {
+        File workingDirectory = new File(getJavaParameters().getWorkingDirectory());
+        if (!workingDirectory.exists()) {
+            throw new ExecutionException(getNotPrebuiltMessage());
+        }
+    }
+
+    private String getNotPrebuiltMessage() {
+        return WuffBundle.message("wuff.runtime.notprebuilt", appModule.getOptionValue(ExternalSystemConstants.EXTERNAL_SYSTEM_MODULE_GROUP_KEY));
     }
 
     @Override
@@ -128,7 +141,7 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
 
             moduleJar.execute();
         } else {
-            throw new ExecutionException(WuffBundle.message("wuff.runtime.notprebuilt", appModule.getOptionValue(ExternalSystemConstants.EXTERNAL_SYSTEM_MODULE_GROUP_KEY)));
+            throw new ExecutionException(getNotPrebuiltMessage());
         }
 
     }
