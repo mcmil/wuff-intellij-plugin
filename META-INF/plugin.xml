@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>pl.cmil.wuff.plugin</id>
     <name>Wuff IntelliJ Plugin</name>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.0</version>
     <vendor email="cmilmichal@gmail.com" url="https://github.com/mcmil/wuff-intellij-plugin">Michal Ćmil</vendor>
 
     <description><![CDATA[
@@ -10,7 +10,8 @@
 
     <change-notes><![CDATA[
       <ul>
-        <li>v0.2.0-SNAPSHOT - Compatibility with Wuff 0.0.13-SNAPSHOT.
+        <li>v0.2.0 - Added equinox restart capability. Checked against IntelliJ IDEA 14. </li>
+        <li>v0.2.0.alpha - Compatibility with Wuff 0.0.13-SNAPSHOT.</li>
         <li>v0.1.0 - Initial release. Provides Wuff Run Configuration which allows to make changes in the application without a full gradle build.</li>
       <ul>
     ]]>

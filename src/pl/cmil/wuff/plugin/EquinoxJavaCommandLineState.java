@@ -1,9 +1,11 @@
 package pl.cmil.wuff.plugin;
 
 import com.intellij.execution.ExecutionException;
+import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.JavaCommandLineState;
 import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.ParametersList;
+import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.util.ExternalSystemConstants;
@@ -14,7 +16,6 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.tools.ant.taskdefs.Jar;
 import org.apache.tools.ant.taskdefs.Zip;
-import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.apache.tools.ant.types.FileSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,22 +25,34 @@ import java.util.List;
 import java.util.Set;
 
 public class EquinoxJavaCommandLineState extends JavaCommandLineState {
+    private final static Logger log = Logger.getInstance(EquinoxJavaCommandLineState.class);
     private final Module appModule;
     private final String mainClass;
     private final String vmArgs;
     private final List<EquinoxConfigurationOptions> enabledConfigs;
     private final String applicationName;
-
-    private final static Logger log = Logger.getInstance(EquinoxJavaCommandLineState.class);
+    private final ExecutionEnvironment environment;
+    private final Executor executor;
 
     protected EquinoxJavaCommandLineState(Module appModule, String mainClass, String vmArgs,
-                                          List<EquinoxConfigurationOptions> enabledConfigs, String applicationName, @NotNull ExecutionEnvironment environment) {
+                                          List<EquinoxConfigurationOptions> enabledConfigs, String applicationName,
+                                          ExecutionEnvironment environment, Executor executor) {
         super(environment);
         this.appModule = appModule;
         this.mainClass = mainClass;
         this.vmArgs = vmArgs;
         this.enabledConfigs = enabledConfigs;
         this.applicationName = applicationName;
+        this.environment = environment;
+        this.executor = executor;
+    }
+
+    @NotNull
+    @Override
+    protected OSProcessHandler startProcess() throws ExecutionException {
+        final OSProcessHandler osProcessHandler = super.startProcess();
+        osProcessHandler.addProcessListener(new EquinoxRestartProcessListener(appModule, environment, executor));
+        return osProcessHandler;
     }
 
     @Override
@@ -82,7 +95,7 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     }
 
     private void rebuildJars() throws ExecutionException {
-        Set<Module> modulesToRebuild =new HashSet<>();
+        Set<Module> modulesToRebuild = new HashSet<>();
         ModuleUtilCore.getDependencies(appModule, modulesToRebuild);
 
         log.info("Rebuilding modules: " + modulesToRebuild);
@@ -106,7 +119,7 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
             addDirectoryToJar(moduleJar, classDir);
 
             File resourceDirectory = new File(moduleBuildPath + File.separator + "resources" + File.separator + "main" + File.separator);
-            if(resourceDirectory.exists()) {
+            if (resourceDirectory.exists()) {
                 addDirectoryToJar(moduleJar, resourceDirectory);
             }
 
