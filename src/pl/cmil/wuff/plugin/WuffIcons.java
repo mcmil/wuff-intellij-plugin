@@ -11,6 +11,9 @@ public class WuffIcons {
 
     public static Icon WUFF_SMALL = load("/icons/wuff.png");
 
+    public static Icon E4XMI_SMALL = load("/icons/e4xmi.png");
+
+
     private WuffIcons() {
         /* Hidden constructor */
     }
