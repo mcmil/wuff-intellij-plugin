@@ -2,7 +2,8 @@
     <id>pl.cmil.wuff.plugin</id>
     <name>Wuff IntelliJ Plugin</name>
     <version>0.3.0</version>
-    <vendor email="cmilmichal@gmail.com" url="https://github.com/mcmil/wuff-intellij-plugin">Michal Ćmil</vendor>
+    <vendor email="cmilmichal@gmail.com" url="https://github.com/mcmil/wuff-intellij-plugin">Michal Ćmil
+    </vendor>
 
     <description><![CDATA[
   A plugin which attempts to ease Eclipse E4 development using Wuff in IntelliJ IDEA.
@@ -27,8 +28,10 @@
         <configurationType implementation="pl.cmil.wuff.plugin.WuffConfigurationType"/>
         <fileIconProvider implementation="pl.cmil.wuff.plugin.WuffFileIconProvider"/>
         <editorTabTitleProvider implementation="pl.cmil.wuff.plugin.WuffEditorTabTitleProvider"/>
-        <toolWindow id="Wuff" icon="/icons/wuff13.png" anchor="right" order="100" factoryClass="pl.cmil.wuff.plugin.EquinoxStateToolWindowFactory" />
-
+        <toolWindow id="Wuff" icon="/icons/wuff13.png" anchor="right" order="FIRST"
+                    factoryClass="pl.cmil.wuff.plugin.EquinoxStateToolWindowFactory"/>
+        <applicationService serviceImplementation="pl.cmil.wuff.plugin.diagnostic.DiagnosticPanel"
+                        serviceInterface="pl.cmil.wuff.plugin.diagnostic.DiagnosticPanel"/>
     </extensions>
 
     <application-components>
