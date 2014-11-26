@@ -32,6 +32,7 @@
                     factoryClass="pl.cmil.wuff.plugin.EquinoxStateToolWindowFactory"/>
         <applicationService serviceImplementation="pl.cmil.wuff.plugin.diagnostic.DiagnosticPanel"
                         serviceInterface="pl.cmil.wuff.plugin.diagnostic.DiagnosticPanel"/>
+        <fileTypeFactory implementation="pl.cmil.wuff.plugin.xmi.XmiFileTypeFactory"/>
     </extensions>
 
     <application-components>
