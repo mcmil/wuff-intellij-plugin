@@ -18,6 +18,7 @@ import org.apache.tools.ant.taskdefs.Jar;
 import org.apache.tools.ant.taskdefs.Zip;
 import org.apache.tools.ant.types.FileSet;
 import org.jetbrains.annotations.NotNull;
+import pl.cmil.wuff.plugin.diagnostic.EquinoxDiagnosisProcessListener;
 
 import java.io.File;
 import java.util.HashSet;
@@ -54,6 +55,8 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
 
         final OSProcessHandler osProcessHandler = super.startProcess();
         osProcessHandler.addProcessListener(new EquinoxRestartProcessListener(appModule, environment, executor));
+        osProcessHandler.addProcessListener(new EquinoxDiagnosisProcessListener(appModule));
+
         return osProcessHandler;
     }
 
@@ -94,6 +97,9 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
         ParametersList programParametersList = params.getProgramParametersList();
         for (EquinoxConfigurationOptions configurationValue : enabledConfigs) {
             programParametersList.add(configurationValue.getParameter());
+            if(configurationValue == EquinoxConfigurationOptions.CONSOLE) {
+                programParametersList.add( "5555" );
+            }
         }
 
         programParametersList.add("-application", applicationName);

@@ -27,6 +27,8 @@
         <configurationType implementation="pl.cmil.wuff.plugin.WuffConfigurationType"/>
         <fileIconProvider implementation="pl.cmil.wuff.plugin.WuffFileIconProvider"/>
         <editorTabTitleProvider implementation="pl.cmil.wuff.plugin.WuffEditorTabTitleProvider"/>
+        <toolWindow id="Wuff" icon="/icons/wuff13.png" anchor="right" order="100" factoryClass="pl.cmil.wuff.plugin.EquinoxStateToolWindowFactory" />
+
     </extensions>
 
     <application-components>
