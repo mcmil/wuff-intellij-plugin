@@ -2,20 +2,18 @@ package pl.cmil.wuff.plugin.xmi;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import com.intellij.lang.cacheBuilder.SimpleWordsScanner;
-import com.intellij.xml.util.XmlUtil;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
-import org.intellij.plugins.relaxNG.references.IdRefProvider;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
+import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.XmlSuppressableInspectionTool;
-import com.intellij.lang.cacheBuilder.WordOccurrence;
-import com.intellij.lang.xml.XmlFindUsagesProvider;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.ElementManipulators;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
@@ -26,7 +24,6 @@ import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.Processor;
 import com.intellij.xml.util.XmlRefCountHolder;
 
 public class XmiDuplicatedIdInspection extends XmlSuppressableInspectionTool
@@ -80,13 +77,13 @@ public class XmiDuplicatedIdInspection extends XmlSuppressableInspectionTool
             && ((XmlAttribute)(value).getParent()).getName().equals( "xmi:id" ) )
         {
 
-            int matches = StringUtils.countMatches( file.getText(), ((XmlAttribute)(value).getParent()).getText() );
+            int matches =
+                StringUtils.countMatches( file.getText(), ((XmlAttribute)(value).getParent()).getText() );
 
-            if( matches >1 )
+            if( matches > 1 )
             {
-                holder.registerProblem( value, "XMI Duplicate id",
-                    ProblemHighlightType.GENERIC_ERROR,
-                    ElementManipulators.getValueTextRange( value ) );
+                holder.registerProblem( value, "XMI Duplicate id", ProblemHighlightType.GENERIC_ERROR,
+                    ElementManipulators.getValueTextRange( value ), new DuplicateIdQuickFix() );
             }
         }
     }
@@ -110,4 +107,26 @@ public class XmiDuplicatedIdInspection extends XmlSuppressableInspectionTool
     {
         return true;
     }
+
+    private static class DuplicateIdQuickFix implements LocalQuickFix
+    {
+        @NotNull
+        public String getName()
+        {
+            return "Generate new id...";
+        }
+
+        public void applyFix( @NotNull Project project, @NotNull ProblemDescriptor descriptor )
+        {
+            ((XmlAttribute)descriptor.getPsiElement().getParent()).setValue( RandomStringUtils
+                .randomAlphanumeric( 8 ) );
+        }
+
+        @NotNull
+        public String getFamilyName()
+        {
+            return getName();
+        }
+    }
+
 }
