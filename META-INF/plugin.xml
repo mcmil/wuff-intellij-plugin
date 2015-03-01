@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>pl.cmil.wuff.plugin</id>
     <name>Wuff IntelliJ Plugin</name>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
     <vendor email="cmilmichal@gmail.com" url="https://github.com/mcmil/wuff-intellij-plugin">Michal Ćmil
     </vendor>
 
@@ -11,6 +11,7 @@
 
     <change-notes><![CDATA[
       <ul>
+        <li>v0.3.1 - Added e4xmi editing hints. Diagnostics for WebConsole are now supported. </li>
         <li>v0.3.0 - Added e4xmi icons and editor tab titles. </li>
         <li>v0.2.0 - Added equinox restart capability. Checked against IntelliJ IDEA 14. </li>
         <li>v0.2.0.alpha - Compatibility with Wuff 0.0.13-SNAPSHOT.</li>
