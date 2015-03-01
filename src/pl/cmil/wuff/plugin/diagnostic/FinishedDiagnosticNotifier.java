@@ -9,7 +9,7 @@ public interface FinishedDiagnosticNotifier
     Topic< FinishedDiagnosticNotifier > DIAGNOSTIC_TOPIC = Topic.create( "wuff-diagnostic",
         FinishedDiagnosticNotifier.class );
 
-    void diagnosisSuccessful( List< BundleDiagnosis > bundles, String diag );
+    void diagnosisSuccessful( List< BundleDiagnosis > bundles );
 
     void diagnosisStarted();
 

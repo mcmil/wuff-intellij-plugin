@@ -1,10 +1,6 @@
 package pl.cmil.wuff.plugin;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import pl.cmil.wuff.plugin.diagnostic.FinishedDiagnosticNotifier;
-import pl.cmil.wuff.plugin.diagnostic.TelnetEquinoxDiagnostic;
 
 import com.intellij.execution.Executor;
 import com.intellij.execution.ProgramRunnerUtil;

@@ -1,49 +1,42 @@
 package pl.cmil.wuff.plugin.diagnostic;
 
-public class BundleDiagnosis
-{
+import java.util.Comparator;
+
+public class BundleDiagnosis {
     private String name;
     private Status status;
     private int id;
 
-    public BundleDiagnosis( String name, Status status, int id )
-    {
+    public BundleDiagnosis(String name, Status status, int id) {
         this.name = name;
         this.status = status;
         this.id = id;
     }
 
-    public static BundleDiagnosis from( String[] data )
-    {
-        String[] nameAndStatus = data[ 1 ].split( "[ ]+" );
-
-        return new BundleDiagnosis( nameAndStatus[ 1 ], Status.getFrom( nameAndStatus[ 0 ] ),
-            Integer.parseInt( data[ 0 ] ) );
-    }
-
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public Status getStatus()
-    {
+    public Status getStatus() {
         return status;
     }
 
-    public int getId()
-    {
+    public int getId() {
         return id;
     }
 
-    public enum Status
-    {
-        OK,NOT;
+    @Override
+    public String toString() {
+        return getId() + " " + getName() + " " + getStatus();
+    }
 
-        public static Status getFrom( String status )
-        {
-            if( status.equals( "INSTALLED" ) )
-            {
+    public enum Status {
+        OK, NOT;
+
+        public static final String INSTALLED = "INSTALLED";
+
+        public static Status getFrom(String status) {
+            if (status.equalsIgnoreCase(INSTALLED)) {
                 return NOT;
             }
             return OK;
@@ -51,9 +44,14 @@ public class BundleDiagnosis
 
     }
 
-    @Override
-    public String toString()
-    {
-        return getId() + " " + getName() + " " + getStatus();
+    public class Sorter implements Comparator<BundleDiagnosis> {
+        @Override
+        public int compare(BundleDiagnosis x, BundleDiagnosis y) {
+            int statusCompare = x.getStatus().compareTo(y.getStatus());
+            if (statusCompare != 0) {
+                return statusCompare;
+            }
+            return Integer.compare(x.getId(), y.getId());
+        }
     }
 }
