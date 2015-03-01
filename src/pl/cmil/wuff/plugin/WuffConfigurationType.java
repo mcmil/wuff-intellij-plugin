@@ -9,9 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.util.Arrays;
 
-/**
- * Created by Michal on 2014-09-06.
- */
 public class WuffConfigurationType implements ConfigurationType {
 
     public static final String WUFF_ID = "wuff";
@@ -29,6 +26,11 @@ public class WuffConfigurationType implements ConfigurationType {
                         EquinoxConfigurationOptions.CLEAR_PERSISTED_STATE, EquinoxConfigurationOptions.CONSOLE, EquinoxConfigurationOptions.CONSOLE_LOG));
                 configurationValues.setApplicationName("org.eclipse.fx.ui.workbench.fx.application");
                 configurationValues.setVmArgs("");
+                configurationValues.setAutoDiagnostic(true);
+                configurationValues.setDiagnosticUrl("http://localhost:5310/system/console/");
+                configurationValues.setDiagnosticUsername("admin");
+                configurationValues.setDiagnosticPassword("admin");
+
                 return runConfiguration;
             }
 

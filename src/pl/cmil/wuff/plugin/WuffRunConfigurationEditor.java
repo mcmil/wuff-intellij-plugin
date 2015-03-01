@@ -4,13 +4,14 @@ import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.roots.ui.configuration.ModulesCombobox;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;
+import org.jdesktop.swingx.JXTitledSeparator;
 import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.roots.ui.configuration.ModulesCombobox;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,23 +20,26 @@ import java.util.List;
 
 public class WuffRunConfigurationEditor extends SettingsEditor<WuffRunConfiguration> {
 
-    private ModulesCombobox myModules = new ModulesCombobox();
     private final LabeledComponent<RawCommandLineEditor> myVMParameters = new LabeledComponent<RawCommandLineEditor>();
-
+    private final List<JBCheckBox> launchConfigOptions;
+    private ModulesCombobox myModules = new ModulesCombobox();
+    //Launch args
     private JBCheckBox myConsole = new JBCheckBox(WuffBundle.message("wuff.run.config.console"));
     private JBCheckBox myConsoleLog = new JBCheckBox(WuffBundle.message("wuff.run.config.consoleLog"));
     private JBCheckBox myClearPersistedState = new JBCheckBox(WuffBundle.message("wuff.run.config.clearpersistedstate"));
     private JBCheckBox myOSGiClean = new JBCheckBox(WuffBundle.message("wuff.run.config.osgiclean"));
     private JBCheckBox myNoExit = new JBCheckBox(WuffBundle.message("wuff.run.config.noexit"));
-
+    //Diagnostics
+    private JBCheckBox myAutomaticDiagnostic = new JBCheckBox(WuffBundle.message("wuff.run.config.automaticDiagnostic"));
+    private JTextField myUrl = new JTextField();
+    private JTextField myUser = new JTextField();
+    private JPasswordField myPassword = new JPasswordField();
+    //Run
     private JTextField myEquinoxMainClass = new JTextField();
     private JTextField myApplicationName = new JTextField();
 
-
     private WuffRunConfiguration config;
     private PersistentConfigurationValues configurationValues;
-
-    private final List<JBCheckBox> launchConfigOptions;
     private Map<JBCheckBox, EquinoxConfigurationOptions> optionMapping = new HashMap<JBCheckBox, EquinoxConfigurationOptions>();
 
     public WuffRunConfigurationEditor(WuffRunConfiguration config) {
@@ -75,6 +79,12 @@ public class WuffRunConfigurationEditor extends SettingsEditor<WuffRunConfigurat
             }
         }
         configurationValues.replaceAllEnableConfigs(enabledConfigsFromEditor);
+
+        configurationValues.setAutoDiagnostic(myAutomaticDiagnostic.isSelected());
+        configurationValues.setDiagnosticUrl(myUrl.getText());
+        configurationValues.setDiagnosticUsername(myUser.getText());
+        configurationValues.setDiagnosticPassword(myPassword.getText());
+
     }
 
     @NotNull
@@ -114,6 +124,27 @@ public class WuffRunConfigurationEditor extends SettingsEditor<WuffRunConfigurat
         panel.add(myVMParameters, gc);
 
         panel.add(createCheckboxPanel(), gc);
+
+        panel.add(new JXTitledSeparator(WuffBundle.message("wuff.run.config.diagnostics")), gc);
+
+        gc.weightx = 1;
+        panel.add(myAutomaticDiagnostic, gc);
+
+        gc.gridx = 0;
+        panel.add(new JBLabel(WuffBundle.message("wuff.run.config.diagnostic.url")), gc);
+        gc.gridx = 1;
+        panel.add(myUrl, gc);
+
+        gc.gridx = 0;
+        panel.add(new JBLabel(WuffBundle.message("wuff.run.config.diagnostic.user")), gc);
+        gc.gridx = 1;
+        panel.add(myUser, gc);
+
+        gc.gridx = 0;
+        panel.add(new JBLabel(WuffBundle.message("wuff.run.config.diagnostic.pass")), gc);
+        gc.gridx = 1;
+        panel.add(myPassword, gc);
+
         setCurrentValuesToControls();
 
         return panel;
@@ -131,6 +162,10 @@ public class WuffRunConfigurationEditor extends SettingsEditor<WuffRunConfigurat
             }
         }
 
+        myAutomaticDiagnostic.setSelected(configurationValues.isAutoDiagnostic());
+        myUrl.setText(configurationValues.getDiagnosticUrl());
+        myUser.setText(configurationValues.getDiagnosticUsername());
+        myPassword.setText(configurationValues.getDiagnosticPassword());
     }
 
     private Component createCheckboxPanel() {
@@ -142,6 +177,5 @@ public class WuffRunConfigurationEditor extends SettingsEditor<WuffRunConfigurat
 
         return panel;
     }
-
 
 }

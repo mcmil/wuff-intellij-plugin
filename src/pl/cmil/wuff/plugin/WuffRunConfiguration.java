@@ -57,7 +57,7 @@ public class WuffRunConfiguration extends RunConfigurationBase implements Module
         if (ProjectRootManager.getInstance(executionEnvironment.getProject()).getProjectSdk() == null) {
             throw CantRunException.noJdkConfigured();
         }
-        return new EquinoxJavaCommandLineState(getModule(), configurationValues.getMainClass(), configurationValues.getVmArgs(), configurationValues.getEnabledConfigs(), configurationValues.getApplicationName(), executionEnvironment, executor);
+        return new EquinoxJavaCommandLineState(getModule(), configurationValues, executionEnvironment, executor);
     }
 
     public PersistentConfigurationValues getConfigurationValues() {

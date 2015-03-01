@@ -23,7 +23,7 @@ public class WebConsoleDiagnosticProvider implements EquinoxDiagnosticProvider {
     }
 
     private static BundleDiagnosis convert(WebConsoleBundleDataDto bundleDataDto) {
-        return new BundleDiagnosis(bundleDataDto.getSymbolicName(), BundleDiagnosis.Status.getFrom(bundleDataDto.getState()), bundleDataDto.getId());
+        return new BundleDiagnosis(bundleDataDto.getSymbolicName() + "_" + bundleDataDto.getVersion(), BundleDiagnosis.Status.getFrom(bundleDataDto.getState()), bundleDataDto.getId());
     }
 
     @Override

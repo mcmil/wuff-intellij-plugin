@@ -93,7 +93,7 @@ public class DiagnosticPanel implements ApplicationComponent {
                     }
 
                     @Override
-                    public void diagnosisFailed() {
+                    public void diagnosisFailed(String message) {
                         ApplicationManager.getApplication().invokeLater(() -> {
                             list.getEmptyText().setText("Diagnosis Failed");
                             listModel.clear();

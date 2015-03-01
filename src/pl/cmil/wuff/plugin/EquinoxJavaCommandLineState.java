@@ -28,6 +28,7 @@ import java.util.Set;
 public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     private final static Logger log = Logger.getInstance(EquinoxJavaCommandLineState.class);
     private final Module appModule;
+    private final PersistentConfigurationValues configurationValues;
     private final String mainClass;
     private final String vmArgs;
     private final List<EquinoxConfigurationOptions> enabledConfigs;
@@ -35,15 +36,15 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     private final ExecutionEnvironment environment;
     private final Executor executor;
 
-    protected EquinoxJavaCommandLineState(Module appModule, String mainClass, String vmArgs,
-                                          List<EquinoxConfigurationOptions> enabledConfigs, String applicationName,
+    protected EquinoxJavaCommandLineState(Module appModule, PersistentConfigurationValues configurationValues,
                                           ExecutionEnvironment environment, Executor executor) {
         super(environment);
         this.appModule = appModule;
-        this.mainClass = mainClass;
-        this.vmArgs = vmArgs;
-        this.enabledConfigs = enabledConfigs;
-        this.applicationName = applicationName;
+        this.configurationValues = configurationValues;
+        this.mainClass = configurationValues.getMainClass();
+        this.vmArgs = configurationValues.getVmArgs();
+        this.enabledConfigs = configurationValues.getEnabledConfigs();
+        this.applicationName = configurationValues.getApplicationName();
         this.environment = environment;
         this.executor = executor;
     }
@@ -55,7 +56,10 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
 
         final OSProcessHandler osProcessHandler = super.startProcess();
         osProcessHandler.addProcessListener(new EquinoxRestartProcessListener(appModule, environment, executor));
-        osProcessHandler.addProcessListener(new EquinoxDiagnosisProcessListener(appModule));
+
+        if (configurationValues.isAutoDiagnostic()) {
+            osProcessHandler.addProcessListener(new EquinoxDiagnosisProcessListener(appModule, configurationValues));
+        }
 
         return osProcessHandler;
     }
@@ -97,8 +101,8 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
         ParametersList programParametersList = params.getProgramParametersList();
         for (EquinoxConfigurationOptions configurationValue : enabledConfigs) {
             programParametersList.add(configurationValue.getParameter());
-            if(configurationValue == EquinoxConfigurationOptions.CONSOLE) {
-                programParametersList.add( "5555" );
+            if (configurationValue == EquinoxConfigurationOptions.CONSOLE) {
+                programParametersList.add("5555");
             }
         }
 

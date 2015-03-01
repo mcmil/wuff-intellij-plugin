@@ -13,6 +13,6 @@ public interface FinishedDiagnosticNotifier
 
     void diagnosisStarted();
 
-    void diagnosisFailed();
+    void diagnosisFailed(String message);
 
 }
