@@ -26,4 +26,4 @@ Run configuration screen, along with available options is shown on the screensho
 * Currently tested only for [e(fx)clipse](http://www.eclipse.org/efxclipse/index.html) 
 * In case a change in manifests or dependencies, a gradle build is required (at least the task `prepareRunConfig` must be executed) 
 * IntelliJ Idea in version at least 13.1.4 is required at the moment (Gradle projects are imported in a different way in version 13.1.3)
-
+* The released version works with 14.1, although the trunk has some minor issues (e4xmi analysis does not work).
