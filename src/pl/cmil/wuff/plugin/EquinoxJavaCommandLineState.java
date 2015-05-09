@@ -108,9 +108,6 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
         ParametersList programParametersList = params.getProgramParametersList();
         for (EquinoxConfigurationOptions configurationValue : enabledConfigs) {
             programParametersList.add(configurationValue.getParameter());
-            if (configurationValue == EquinoxConfigurationOptions.CONSOLE) {
-                programParametersList.add("5555");
-            }
         }
 
         programParametersList.add("-application", applicationName);
