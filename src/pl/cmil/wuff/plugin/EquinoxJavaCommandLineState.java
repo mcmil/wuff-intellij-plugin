@@ -7,6 +7,9 @@ import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.util.ExternalSystemConstants;
 import com.intellij.openapi.module.Module;
@@ -21,9 +24,13 @@ import org.jetbrains.annotations.NotNull;
 import pl.cmil.wuff.plugin.diagnostic.EquinoxDiagnosisProcessListener;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class EquinoxJavaCommandLineState extends JavaCommandLineState {
     private final static Logger log = Logger.getInstance(EquinoxJavaCommandLineState.class);
@@ -126,6 +133,11 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
         for (Module module : modulesToRebuild) {
             rebuildModuleJar(module);
         }
+
+        if (modulesToRebuild.stream().anyMatch(this::isGradleConfigurationNotClear)) {
+            warnUserAboutBuildAmbiguity();
+        }
+
     }
 
     private void rebuildModuleJar(Module module) throws ExecutionException {
@@ -154,6 +166,23 @@ public class EquinoxJavaCommandLineState extends JavaCommandLineState {
             throw new ExecutionException(getNotPrebuiltMessage());
         }
 
+    }
+
+    private void warnUserAboutBuildAmbiguity() {
+        Notification buildCheckNotification = new Notification("wuff.build.warning", "Wuff build warning",
+                WuffBundle.message("wuff.build.warning.uncertain.configuration"), NotificationType.WARNING)
+                .setImportant(true);
+        Notifications.Bus.notify(buildCheckNotification);
+    }
+
+    private boolean isGradleConfigurationNotClear(Module module) {
+        try (Stream<Path> paths = Files.walk(Paths.get(getModuleBuildPath(module) + File.separator + "libs"))) {
+            return paths.filter(f -> f.getFileName().toString().endsWith(".jar")).count() > 1;
+        } catch (Exception e) {
+            log.warn("Cannot check gradle configuration. The build will continue ", e);
+        }
+
+        return false;
     }
 
     private void addDirectoryToJar(Jar moduleJar, File dir) {
