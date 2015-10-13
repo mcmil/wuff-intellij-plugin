@@ -1,5 +1,6 @@
 package pl.cmil.wuff.plugin.diagnostic.rest
 
+import pl.cmil.wuff.plugin.diagnostic.BundleDiagnosis
 import pl.cmil.wuff.plugin.diagnostic.RawDiagnosticDataProvider
 import spock.lang.Shared
 import spock.lang.Specification
